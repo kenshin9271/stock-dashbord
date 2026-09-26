@@ -1,3 +1,5 @@
+import os
+
 import yfinance as yf
 import dash
 from dash import dcc, html
@@ -15,6 +17,7 @@ hist["MA50"] = hist["Close"].rolling(50).mean()
 signal = "Buy" if hist["MA20"].iloc[-1] > hist["MA50"].iloc[-1] else "Sell"
 
 app = dash.Dash(__name__)
+server = app.server
 
 app.layout = html.Div([
     html.H1(f"{ticker} Stock Dashboard"),
@@ -32,8 +35,8 @@ app.layout = html.Div([
                     close=hist["Close"],
                     name="Price"
                 ),
-                go.Line(x=hist.index, y=hist["MA20"], name="MA20"),
-                go.Line(x=hist.index, y=hist["MA50"], name="MA50")
+                go.Scatter(x=hist.index, y=hist["MA20"], name="MA20", mode="lines"),
+                go.Scatter(x=hist.index, y=hist["MA50"], name="MA50", mode="lines")
             ],
             "layout": go.Layout(title="Price & Moving Averages")
         }
@@ -58,4 +61,8 @@ app.layout = html.Div([
 ])
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", "8050")),
+        debug=False,
+    )

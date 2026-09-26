@@ -1,1 +1,1 @@
-web: python stock_dashboard.py
+web: gunicorn --bind 0.0.0.0:$PORT stock_dashboard:server
